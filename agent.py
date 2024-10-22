@@ -44,33 +44,34 @@ class DQNAgent:
         self.memory.append((state, action, reward, next_state, done))
 
     def act(self, state):
-        if random.random() < self.epsilon:
-            return random.randrange(self.action_num)
-        state = torch.FloatTensor(state).unsqueeze(0).to(self.device)
-        with torch.no_grad():
-            q_values = self.policy_net(state)
-        return q_values.argmax().item()
+      state = torch.FloatTensor(state.cpu()).unsqueeze(0).to(self.device)  # Assurez-vous que le tenseur est sur le CPU
+      if np.random.rand() <= self.epsilon:
+          return random.randrange(self.action_num)
+      q_values = self.policy_net(state)
+      return torch.argmax(q_values[0]).item()
+
 
     def replay(self):
-        if len(self.memory) < self.batch_size:
-            return
-        minibatch = random.sample(self.memory, self.batch_size)
-        state_batch, action_batch, reward_batch, next_state_batch, done_batch = zip(*minibatch)
-        
-        state_batch = torch.FloatTensor(np.array(state_batch)).to(self.device)
-        action_batch = torch.LongTensor(action_batch).unsqueeze(1).to(self.device)
-        reward_batch = torch.FloatTensor(reward_batch).to(self.device)
-        next_state_batch = torch.FloatTensor(np.array(next_state_batch)).to(self.device)
-        done_batch = torch.FloatTensor(done_batch).to(self.device)
-        
-        q_values = self.policy_net(state_batch).gather(1, action_batch)
-        next_q_values = self.target_net(next_state_batch).max(1)[0].detach()
-        target_q_values = reward_batch + (self.gamma * next_q_values * (1 - done_batch))
+      if len(self.memory) < self.batch_size:
+          return
+      minibatch = random.sample(self.memory, self.batch_size)
+      state_batch, action_batch, reward_batch, next_state_batch, done_batch = zip(*minibatch)
+      
+      state_batch = torch.FloatTensor(np.array([s.cpu() for s in state_batch])).to(self.device)
+      action_batch = torch.LongTensor(action_batch).unsqueeze(1).to(self.device)
+      reward_batch = torch.FloatTensor(reward_batch).to(self.device)
+      next_state_batch = torch.FloatTensor(np.array([s.cpu() for s in next_state_batch])).to(self.device)
+      done_batch = torch.FloatTensor(done_batch).to(self.device)
+      
+      q_values = self.policy_net(state_batch).gather(1, action_batch)
+      next_q_values = self.target_net(next_state_batch).max(1)[0].detach()
+      target_q_values = reward_batch + (self.gamma * next_q_values * (1 - done_batch))
 
-        loss = nn.MSELoss()(q_values, target_q_values.unsqueeze(1))
-        self.optimizer.zero_grad()
-        loss.backward()
-        self.optimizer.step()
+      loss = nn.MSELoss()(q_values, target_q_values.unsqueeze(1))
+      self.optimizer.zero_grad()
+      loss.backward()
+      self.optimizer.step()
 
-        if self.epsilon > self.epsilon_min:
-            self.epsilon *= self.epsilon_decay
+      if self.epsilon > self.epsilon_min:
+          self.epsilon *= self.epsilon_decay
+
