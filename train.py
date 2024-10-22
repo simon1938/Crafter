@@ -1,7 +1,7 @@
 import argparse
 import pickle
 from pathlib import Path
-
+from agent import DQNAgent
 import torch
 
 from src.crafter_wrapper import Env
@@ -68,15 +68,37 @@ def _info(opt):
     )
 
 
+# def main(opt):
+#     _info(opt)
+#     #opt.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#     opt.device = torch.device("cpu")
+#     env = Env("train", opt)
+#     eval_env = Env("eval", opt)
+#     agent = RandomAgent(env.action_space.n)
+
+#     # main loop
+#     ep_cnt, step_cnt, done = 0, 0, True
+#     while step_cnt < opt.steps or not done:
+#         if done:
+#             ep_cnt += 1
+#             obs, done = env.reset(), False
+
+#         action = agent.act(obs)
+#         obs, reward, done, info = env.step(action)
+
+#         step_cnt += 1
+
+#         # evaluate once in a while
+#         if step_cnt % opt.eval_interval == 0:
+#             eval(agent, eval_env, step_cnt, opt)
+
 def main(opt):
     _info(opt)
-    #opt.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    opt.device = torch.device("cpu")
+    opt.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     env = Env("train", opt)
     eval_env = Env("eval", opt)
-    agent = RandomAgent(env.action_space.n)
+    agent = DQNAgent(env.action_space.n, opt.device)
 
-    # main loop
     ep_cnt, step_cnt, done = 0, 0, True
     while step_cnt < opt.steps or not done:
         if done:
@@ -84,13 +106,17 @@ def main(opt):
             obs, done = env.reset(), False
 
         action = agent.act(obs)
-        obs, reward, done, info = env.step(action)
+        next_obs, reward, done, info = env.step(action)
+        agent.remember(obs, action, reward, next_obs, done)
+        agent.replay()
 
+        obs = next_obs
         step_cnt += 1
 
-        # evaluate once in a while
         if step_cnt % opt.eval_interval == 0:
             eval(agent, eval_env, step_cnt, opt)
+            agent.update_target_net()
+
 
 
 def get_options():
