@@ -1,35 +1,103 @@
-# Crafter Assignment starter code
+# Deep Reinforcement Learning Agent for Crafter
 
-This folder contains the following code:
+## 📌 Objective
+Développer un agent d'apprentissage par renforcement profond (DRL) capable de jouer au jeu **Crafter** de manière plus performante qu'une politique aléatoire. Ce projet explore des défis comme l’exploration, l’assignation de crédit à long terme, et la généralisation dans un environnement procédural complexe.
 
-- `train.py` A basic training loop with a random agent you can use for your own agent. Feel free to modify it at will.
-- `src/crafter_wrapper.py` A wrapper over the `Crafter` environment that provides basic logging and observation preprocessing.
-- `analysis/plot_eval_performance.py` A simple script for plotting the performance of your agent during evaluation (not training).
+## 🎮 Environnement : Crafter
+Crafter est une version simplifiée en 2D de Minecraft, avec :
+- Génération procédurale de carte à chaque épisode
+- Un arbre technologique complexe
+- Un cadre idéal pour tester les capacités des agents à apprendre des politiques de long terme
 
-## Instructions
+> 📦 [Crafter GitHub](https://github.com/danijar/crafter)
 
-Follow the installation instructions in the [Crafter repository](https://github.com/danijar/crafter). It's ideal to use some kind of virtual env, my personal favourite is `miniconda`, although installation should work with the system's python as well.
+---
 
-For running the Random Agent execute:
+## 🧠 Implémentations
+
+### 🔸 Random Agent
+- Baseline naïve : les actions sont choisies aléatoirement.
+- Sert de référence de performance minimale.
+
+![Random Agent Performance](images/random_agent_plot.png)
+
+---
+
+### 🔹 Deep Q-Network (DQN)
+- Approximation des Q-valeurs via un réseau de neurones.
+- Apprentissage à partir d’expériences précédentes (Replay Buffer).
+- Politique ε-greedy pour l’exploration.
+
+![DQN Performance](images/dqn_plot.png)
+
+---
+
+### 🔹 Double DQN
+- Corrige la surestimation des Q-valeurs dans DQN.
+- Utilise deux réseaux : un pour la sélection d’action, un pour l’estimation de valeur.
+
+![Double DQN Performance](images/double_dqn_plot.png)
+
+---
+
+### 🔹 Double Dueling DQN + Categorized Loss
+- Architecture **Dueling** : séparation des flux de valeur et d’avantage.
+- **Double DQN** pour stabilité.
+- **Categorized Loss** : priorité donnée aux erreurs dans les zones critiques → meilleure efficacité d’apprentissage.
+
+![Double Dueling DQN with Categorized Loss Performance](images/double_dueling_categorized_plot.png)
+
+---
+
+## 📈 Résultats
+
+| Agent                              | Reward moyen / épisode |
+|-----------------------------------|-------------------------|
+| Random Agent                      | ~X.XX                   |
+| DQN                               | ~X.XX                   |
+| Double DQN                        | ~X.XX                   |
+| Double Dueling DQN + Cat. Loss    | **~X.XX**               |
+
+> Les performances sont moyennées sur plusieurs runs avec des seeds différentes.
+
+---
+
+## 🔧 Fichiers
+
+- `train.py` : point d’entrée pour l’entraînement (`python train.py`)
+- `agents/` : implémentations des différentes architectures (DQN, Double DQN, etc.)
+- `analysis/plot_eval_performance.py` : script pour tracer les courbes de performance
+- `logdir/` : dossiers de log pour chaque agent
+- `images/` : graphiques des résultats
+
+---
+
+## 📝 Installation et Exécution
 
 ```bash
-python train.py --steps 10_000 --eval-interval 2500 --logdir logdir/random_agent/0
-```
+# Installation des dépendances
+pip install -r requirements.txt
 
-This will run the Random Agent for 10_000 steps and evaluate it every 2500 steps for 20 episodes. The results with be written in `logdir/random_agent/0`, where `0` indicates the run.
+# Entraîner l'agent avec les meilleurs hyperparamètres
+python train.py
 
-For executing multiple runs in parallel you could do:
+# Visualiser les performances
+python analysis/plot_eval_performance.py --logdir logdir/my_agent
 
-```bash
-for i in $(seq 1 4); do python train.py --steps 250_000 --eval-interval 25_000 --logdir logdir/random_agent/$i & done
-```
+## 👥 Auteurs
 
-### Visualization
+- **Simon Illouz--Laurent**
+- **Aubin-Bonnefoy**
+---
 
-Finally, you can visualize the _evaluation_ performance of the agent across the four runs using:
+## 💡 Idées et extensions possibles
 
-```bash
-python analysis/plot_eval_performance.py --logdir logdir/random_agent
-```
+- Entraînement à partir de **démonstrations humaines**
+---
 
-For other performance metrics see the [plotting scripts](https://github.com/danijar/crafter/tree/main/analysis) in the original Crafter repo.
+## 📚 Références
+
+- Danijar Hafner, *"Benchmarking the Spectrum of Agent Capabilities"*, 2021.
+- H. van Hasselt et al., *"Deep Reinforcement Learning with Double Q-learning"*, 2016.
+- Ziyun Wang et al., *"Dueling Network Architectures for Deep RL"*, 2016.
+- Marc G. Bellemare et al., *"A Distributional Perspective on Reinforcement Learning"*, 2017.
