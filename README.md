@@ -1,102 +1,94 @@
 # Deep Reinforcement Learning Agent for Crafter
 
 ## 📌 Objective
-Développer un agent d'apprentissage par renforcement profond (DRL) capable de jouer au jeu **Crafter** de manière plus performante qu'une politique aléatoire. Ce projet explore des défis comme l’exploration, l’assignation de crédit à long terme, et la généralisation dans un environnement procédural complexe.
+Develop a **Deep Reinforcement Learning (DRL)** agent capable of playing the **Crafter** game more effectively than a random policy. This project explores challenges such as exploration, long-term credit assignment, and generalization in a procedurally complex environment.
 
-## 🎮 Environnement : Crafter
-Crafter est une version simplifiée en 2D de Minecraft, avec :
-- Génération procédurale de carte à chaque épisode
-- Un arbre technologique complexe
-- Un cadre idéal pour tester les capacités des agents à apprendre des politiques de long terme
+## 🎮 Environment: Crafter
+Crafter is a simplified 2D version of Minecraft, with:
+- Procedural map generation at each episode
+- A complex tech tree
+- An ideal framework to test agents’ abilities to learn long-term policies
 
 > 📦 [Crafter GitHub](https://github.com/danijar/crafter)
 
 ---
 
-## 🧠 Implémentations
+## 🧠 Implementations
 
 ### 🔸 Random Agent
-- Baseline naïve : les actions sont choisies aléatoirement.
-- Sert de référence de performance minimale.
-
-![Random Agent Performance](images/random_agent_plot.png)
+- Naive baseline: actions are selected randomly.
+- Serves as a minimum performance reference.
 
 ---
 
 ### 🔹 Deep Q-Network (DQN)
-- Approximation des Q-valeurs via un réseau de neurones.
-- Apprentissage à partir d’expériences précédentes (Replay Buffer).
-- Politique ε-greedy pour l’exploration.
-
-![DQN Performance](images/dqn_plot.png)
+- Approximates Q-values via a neural network.
+- Learns from past experiences (Replay Buffer).
+- Uses ε-greedy policy for exploration.
 
 ---
 
 ### 🔹 Double DQN
-- Corrige la surestimation des Q-valeurs dans DQN.
-- Utilise deux réseaux : un pour la sélection d’action, un pour l’estimation de valeur.
-
-![Double DQN Performance](images/double_dqn_plot.png)
+- Addresses Q-value overestimation in DQN.
+- Uses two networks: one for action selection, one for value estimation.
 
 ---
 
 ### 🔹 Double Dueling DQN + Categorized Loss
-- Architecture **Dueling** : séparation des flux de valeur et d’avantage.
-- **Double DQN** pour stabilité.
-- **Categorized Loss** : priorité donnée aux erreurs dans les zones critiques → meilleure efficacité d’apprentissage.
-
-![Double Dueling DQN with Categorized Loss Performance](images/double_dueling_categorized_plot.png)
+- **Dueling architecture**: separates value and advantage streams.
+- **Double DQN** for stability.
+- **Categorized Loss**: emphasizes critical error zones → more efficient learning.
 
 ---
 
-## 📈 Résultats
+## 📈 Results
 
-| Agent                              | Reward moyen / épisode |
-|-----------------------------------|-------------------------|
-| Random Agent                      | ~X.XX                   |
-| DQN                               | ~X.XX                   |
-| Double DQN                        | ~X.XX                   |
-| Double Dueling DQN + Cat. Loss    | **~X.XX**               |
+| Agent                              | Average Reward / Episode |
+|-----------------------------------|---------------------------|
+| Random Agent                      | ~1.5                      |
+| DQN                               | ~3                        |
+| Double DQN                        | ~3.8                      |
+| Double Dueling DQN + Cat. Loss    | ~5                        |
 
-> Les performances sont moyennées sur plusieurs runs avec des seeds différentes.
-
----
-
-## 🔧 Fichiers
-
-- `train.py` : point d’entrée pour l’entraînement (`python train.py`)
-- `agents/` : implémentations des différentes architectures (DQN, Double DQN, etc.)
-- `analysis/plot_eval_performance.py` : script pour tracer les courbes de performance
-- `logdir/` : dossiers de log pour chaque agent
-- `images/` : graphiques des résultats
+> Results averaged over several runs with different seeds.
 
 ---
 
-## 📝 Installation et Exécution
+## 🔧 Files
+
+- `train.py`: entry point for training (`python train.py`)
+- `agents/`: implementations of various architectures (DQN, Double DQN, etc.)
+- `analysis/plot_eval_performance.py`: script to plot performance curves
+- `logdir/`: log folders for each agent
+- `images/`: result plots
+
+---
+
+## 📝 Installation and Execution
 
 ```bash
-# Installation des dépendances
+# Install dependencies
 pip install -r requirements.txt
 
-# Entraîner l'agent avec les meilleurs hyperparamètres
+# Train the agent with best hyperparameters
 python train.py
 
-# Visualiser les performances
+# Visualize performance
 python analysis/plot_eval_performance.py --logdir logdir/my_agent
 
-## 👥 Auteurs
 
+## 👥 Authors
 - **Simon Illouz--Laurent**
 - **Aubin-Bonnefoy**
+
 ---
 
-## 💡 Idées et extensions possibles
+## 💡 Possible Extensions
+- Training from **human demonstrations**
 
-- Entraînement à partir de **démonstrations humaines**
 ---
 
-## 📚 Références
-
+## 📚 References
 - Danijar Hafner, *"Benchmarking the Spectrum of Agent Capabilities"*, 2021.
 - H. van Hasselt et al., *"Deep Reinforcement Learning with Double Q-learning"*, 2016.
 - Ziyun Wang et al., *"Dueling Network Architectures for Deep RL"*, 2016.
